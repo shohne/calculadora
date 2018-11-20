@@ -42,18 +42,24 @@ import java.util.UUID;
 public class CalculadoraServlet extends HttpServlet {
     private static final long serialVersionUID = 1989907L;
 
-    private static String PATH_FFMPEG = "/usr/local/bin/ffmpeg";
-    private static String PATH_FFPROBE = "/usr/local/bin/ffprobe";
+    private static String PATH_FFMPEG = "/usr/bin/ffmpeg2";
+    private static String PATH_FFPROBE = "/usr/bin/ffprobe2";
     private static String PATH_TEMP = "/tmp/calculadora/";
     private static String prefixFileName = "nada";
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.getWriter().append("Hello! How are you today?");
+    static {
+        configurarFfmpeg();
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse responseServlet)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("\ndoGet");
+        response.getWriter().append("Hello! How are you TODAY?");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse responseServlet) throws ServletException, IOException {
+
+        System.out.println("\ndoPost");
+
         InputStream inputStream = request.getInputStream();
         inputStream = convertFile(inputStream);
 
@@ -162,6 +168,20 @@ public class CalculadoraServlet extends HttpServlet {
             org.apache.commons.io.FileUtils.writeByteArrayToFile(new File(PATH_TEMP + prefixFileName + ".mp3"), result);
 
             return result;
+        }
+    }
+
+    private static void configurarFfmpeg() {
+        try {
+            Object objPathFfmpeg = new InitialContext().lookup("pathFfmpeg");
+            Object objPathFfprob = new InitialContext().lookup("pathFfprob");
+            Object objPathTemp = new InitialContext().lookup("pathTemp");
+
+            if (objPathFfmpeg != null) PATH_FFMPEG = (String) objPathFfmpeg;
+            if (objPathFfprob != null)  PATH_FFPROBE = (String) objPathFfprob;
+            if (objPathTemp != null) PATH_TEMP = (String) objPathTemp;
+        } catch (javax.naming.NamingException ne) {
+            System.out.print("\n " + ne);
         }
     }
 
