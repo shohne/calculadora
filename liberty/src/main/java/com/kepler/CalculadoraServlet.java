@@ -7,7 +7,7 @@ import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest; 
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.cloud.dialogflow.v2.SessionsSettings;
@@ -35,6 +35,8 @@ import com.google.auth.oauth2.*;
 import net.bramp.ffmpeg.builder.*;
 import net.bramp.ffmpeg.*;
 
+import javax.inject.Inject;
+
 import java.util.UUID;
 
 @WebServlet(urlPatterns = "/voice")
@@ -42,17 +44,28 @@ import java.util.UUID;
 public class CalculadoraServlet extends HttpServlet {
     private static final long serialVersionUID = 1989907L;
 
-    private static String PATH_FFMPEG = "/usr/bin/ffmpeg2";
-    private static String PATH_FFPROBE = "/usr/bin/ffprobe2";
     private static String PATH_TEMP = "/tmp/calculadora/";
     private static String prefixFileName = "nada";
 
-    static {
-        configurarFfmpeg();
+    public static void main(String args[]) {
+        System.out.print("\nmain");
     }
 
+    static {
+        configurarPathGravacaoArquivoTemporario();
+    }
+
+    private static void configurarPathGravacaoArquivoTemporario() {
+        try {
+            Object objPathTemp = new InitialContext().lookup("pathTemp");
+            if (objPathTemp != null) PATH_TEMP = (String) objPathTemp;
+        } catch (javax.naming.NamingException ne) {
+            System.out.print("\n " + ne);
+        }
+    }
+
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("\ndoGet");
         response.getWriter().append("Hello! How are you TODAY?");
     }
 
@@ -61,7 +74,7 @@ public class CalculadoraServlet extends HttpServlet {
         System.out.println("\ndoPost");
 
         InputStream inputStream = request.getInputStream();
-        inputStream = convertFile(inputStream);
+        inputStream = ConvertAudio.cafToOpusRemoto(inputStream);
 
         configureProxy();
         SessionsClient sessionsClient = getSessionClient();
@@ -171,20 +184,6 @@ public class CalculadoraServlet extends HttpServlet {
         }
     }
 
-    private static void configurarFfmpeg() {
-        try {
-            Object objPathFfmpeg = new InitialContext().lookup("pathFfmpeg");
-            Object objPathFfprob = new InitialContext().lookup("pathFfprob");
-            Object objPathTemp = new InitialContext().lookup("pathTemp");
-
-            if (objPathFfmpeg != null) PATH_FFMPEG = (String) objPathFfmpeg;
-            if (objPathFfprob != null)  PATH_FFPROBE = (String) objPathFfprob;
-            if (objPathTemp != null) PATH_TEMP = (String) objPathTemp;
-        } catch (javax.naming.NamingException ne) {
-            System.out.print("\n " + ne);
-        }
-    }
-
     private static void configureProxy() {
         try {
             Object objUtilizaProxy = new InitialContext().lookup("utilizaProxy");
@@ -222,6 +221,9 @@ public class CalculadoraServlet extends HttpServlet {
         }
     }
 
+
+
+    /*
     private static InputStream convertFile(InputStream inputStream) throws IOException {
 
         System.out.print("\nconvertFile");
@@ -244,5 +246,6 @@ public class CalculadoraServlet extends HttpServlet {
         return org.apache.commons.io.FileUtils.openInputStream(new File(PATH_TEMP + prefixFileName + "_response.opus"));
 
     }
+    */
 
 }
