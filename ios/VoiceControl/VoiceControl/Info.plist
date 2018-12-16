@@ -48,7 +48,23 @@
 	<string>Need Library access for uploading Images</string>
 	<key>UIFileSharingEnabled</key>
 	<string>YES</string>
-	<key>NSAllowsArbitraryLoads</key>
-	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>web.bndes.net</key>
+			<string></string>
+			<key>web.hom.bndes.net</key>
+			<string></string>
+			<key>web.tst.bndes.net</key>
+			<string></string>
+			<key>web.dsv.bndes.net</key>
+			<string></string>
+			<key>awshohne.hopto.org</key>
+			<string></string>
+		</dict>
+	</dict>
 </dict>
 </plist>
