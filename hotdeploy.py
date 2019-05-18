@@ -6,6 +6,12 @@ from shutil import copyfile
 import hashlib
 import pathlib
 import subprocess
+import argparse
+
+parser = argparse.ArgumentParser(description = 'Hot Deploy de aplicacoes JavaEE em servidor Liberty')
+parser.add_argument('pomdirectory', type=str, help='diretorio que contem o arquvo pom.xml do projeto')
+parser.add_argument('libertyappfolder', type=str, help='caminho para diretorio liberty com a aplicacao [ja expandida]')
+args = parser.parse_args()
 
 def dict_md5_files_in_directory(directory, file_mask, recursive = True):
     files = [f for f in glob.glob(directory + "**/*." + file_mask, recursive = recursive)]
@@ -21,10 +27,10 @@ while True:
     if i > 1000:
         break
 
-    mavenProcess = subprocess.Popen(['mvn', '-f', '/home/hohne/projeto/calculadora/liberty/pom.xml', 'compile'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    mavenProcess = subprocess.Popen(['mvn', '-f', args.pomdirectory + '/pom.xml', 'compile'], stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 
-    dict_md5_files_in_source = dict_md5_files_in_directory("/home/hohne/projeto/calculadora/liberty/target/", "class")
-    dict_md5_files_in_dest = dict_md5_files_in_directory("/home/hohne/projeto/wlp/usr/servers/calculadora/apps/expanded/calculadora.war/WEB-INF/", "class")
+    dict_md5_files_in_source = dict_md5_files_in_directory(args.pomdirectory + '/target/', 'class')
+    dict_md5_files_in_dest = dict_md5_files_in_directory(args.libertyappfolder, 'class')
 
     for file_source in dict_md5_files_in_source.keys():
         if dict_md5_files_in_source[file_source][0] != dict_md5_files_in_dest[file_source][0]:
