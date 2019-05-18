@@ -31,6 +31,9 @@
     <!-- Automatically expand WAR files and EAR files -->
     <applicationManager autoExpand="true"/>
 	
+    <webApplication contextRoot="calculadora" location="calculadora.war" />
+	
+	
 	<jndiEntry jndiName="pathFfmpeg" value='"c:\projeto\ffmpeg\bin\ffmpeg"' />
 	<jndiEntry jndiName="pathFfprob" value='"c:\projeto\ffmpeg\bin\ffprob"' />
 	<jndiEntry jndiName="pathTemp" value='"c:\temp\"' />
